@@ -1,0 +1,37 @@
+/* Full-screen dark background */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0a1e3f; /* Dark blue */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* Container to stack title above canvas */
+.container {
+  text-align: center;
+  position: relative;
+}
+
+/* Title styling */
+h1 {
+  color: white;
+  font-weight: bold;
+  font-size: 2rem;
+  position: absolute;
+  top: -60px; /* adjust above canvas */
+  left: 0;
+  text-align: left;
+}
+
+/* Canvas styling */
+canvas {
+  background-color: white; /* canvas is white */
+  display: block;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}

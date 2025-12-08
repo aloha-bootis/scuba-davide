@@ -1,0 +1,321 @@
+import { Player } from "./entities/Player.js";
+import { Enemy } from "./entities/Enemy.js";
+import { Collectable } from "./entities/collectable.js";
+import { inputHandler } from "./InputHandler.js";
+import { checkCollision } from "./utils.js";
+import { SPRITES } from './config/sprites.js';
+import { GAME_CONFIG } from './config/game.js';
+import PLAYER_CONFIG from "./config/player.js";
+
+export class Game {
+
+  constructor(canvas) {
+    this.canvas = canvas;
+
+    this.width = canvas.width;
+    this.height = canvas.height;  
+
+    this.ctx = canvas.getContext("2d");
+
+    this.input = new inputHandler();
+
+    this.player = new Player({game: this, iputHandler: this.input});
+    this.enemies = [];
+    this.collectables = []; 
+    this.entities = [];
+
+    // game state
+    this.score = 0;
+    this.finalScore = 0; // score from last game
+    this.isRunning = false; // game starts paused on menu
+    this.isDead = false; // track if player is dead
+    this._deathFadeStartTime = 0; // when death fade starts
+    this._deathFadeDuration = GAME_CONFIG.DEATH_FADE_DURATION ?? 1500; // ms
+
+    // water bounds (player cannot go above this line)
+    this.waterSurfaceY = this.height * (GAME_CONFIG.WATER_SURFACE_RATIO ?? 0.15);
+
+    // enemy spawning configuration
+    this.spawnIntervalBase = GAME_CONFIG.ENEMY_SPAWN_BASE ?? 3000; // ms base spawn interval
+    this.spawnIntervalVariance = GAME_CONFIG.ENEMY_SPAWN_VARIANCE ?? 1000; // ±ms variance
+    this._nextSpawnTime = performance.now() + this._getNextSpawnDelay();
+
+    // collectable spawning configuration
+    this.collectableSpawnIntervalBase = GAME_CONFIG.COLLECTABLE_SPAWN_BASE ?? 3000; // ms base spawn interval
+    this.collectableSpawnIntervalVariance = GAME_CONFIG.COLLECTABLE_SPAWN_VARIANCE ?? 1500; // ±ms variance
+    this._nextCollectableSpawnTime = performance.now() + this._getNextCollectableSpawnDelay();
+
+    this.bgImage = new Image();
+    this.bgImage.src = './assets/background2.png';
+  }
+
+  updatePlayer() {
+    this.player.update();
+    // keep player below water surface
+    if (this.player.y < this.waterSurfaceY) {
+      this.player.y = this.waterSurfaceY;
+      // stop upward velocity so player stays at surface instead of repeatedly penetrating
+      if (this.player.vy < 0) this.player.vy = 0;
+    }
+  }
+
+  updateEnemies() {
+    // iterate backwards so we can remove enemies that exit
+    for (let i = this.enemies.length - 1; i >= 0; i--) {
+      const enemy = this.enemies[i];
+      enemy.update();
+
+      // collision with player (use configured compenetration to make enemy collisions more forgiving)
+      const comp = GAME_CONFIG.ENEMY_COLLISION_COMPENETRATION ?? 0.1;
+      if (checkCollision(this.player, enemy, comp)) {
+        this.player.takeDamage(PLAYER_CONFIG.ENEMY_DAMAGE);
+      }
+
+      // remove if marked offscreen
+      if (enemy._offscreen) {
+        this.enemies.splice(i, 1);
+      }
+    }
+  }
+
+  updateCollectables() {
+    // iterate backwards to safely remove
+    for (let i = this.collectables.length - 1; i >= 0; i--) {
+      const collectable = this.collectables[i];
+      collectable.update();
+
+      // collision with player
+      if (checkCollision(this.player, collectable)) {
+        // add to score
+        this.score += 10;
+        collectable._collected = true;
+      }
+
+      // remove if collected or expired
+      if (collectable._collected) {
+        this.collectables.splice(i, 1);
+      }
+    }
+  }
+
+  update() {
+    if (!this.isRunning) return; // skip updates while on menu
+
+    // check if player died
+    if (this.player.breath <= 0 && !this.isDead) {
+      this.isDead = true;
+      this._deathFadeStartTime = performance.now();
+    }
+
+    // if fading, check if fade is done
+    if (this.isDead) {
+      const now = performance.now();
+      if (now - this._deathFadeStartTime >= this._deathFadeDuration) {
+        // fade complete, return to menu
+        this.resetToMenu();
+        return;
+      }
+    }
+
+    this.updatePlayer();
+    this.updateEnemies();
+    this.updateCollectables();
+
+    // spawn enemies on a timer with randomized intervals
+    const now = performance.now();
+    if (now >= this._nextSpawnTime) {
+      this.spawnEnemy();
+      this._nextSpawnTime = now + this._getNextSpawnDelay();
+    }
+
+    // spawn collectables on a timer
+    if (now >= this._nextCollectableSpawnTime) {
+      this.spawnCollectable();
+      this._nextCollectableSpawnTime = now + this._getNextCollectableSpawnDelay();
+    }
+  }
+
+  _getNextSpawnDelay() {
+    // uniform distribution: base ± variance
+    return this.spawnIntervalBase + (Math.random() * 2 - 1) * this.spawnIntervalVariance;
+  }
+
+  _getNextCollectableSpawnDelay() {
+    // uniform distribution: base ± variance
+    return this.collectableSpawnIntervalBase + (Math.random() * 2 - 1) * this.collectableSpawnIntervalVariance;
+  }
+
+  spawnEnemy() {
+    const { width: sizeX, height: sizeY } = SPRITES.SIZES.ENEMY;
+    const sideLeft = Math.random() < 0.5;
+    const startY = Math.random() * (this.height - sizeY);
+    const speedX = 2 + Math.random() * 3;
+    let startX, startVx;
+    if (sideLeft) {
+      startX = -sizeX - 10;
+      startVx = speedX;
+    } else {
+      startX = this.width + 10;
+      startVx = -speedX;
+    }
+    const startVy = (Math.random() * 2 - 1) * 2; 
+
+    const enemy = new Enemy({ game: this, startX, startY, startVx, startVy, sizeX, sizeY });
+    this.enemies.push(enemy);
+  }
+
+  spawnCollectable() {
+    const { width: sizeX, height: sizeY } = SPRITES.SIZES.COLLECTABLE;
+    const startX = Math.random() * (this.width - sizeX);
+    // spawn only below 50% of height
+    const minY = this.height * 0.5;
+    const startY = minY + Math.random() * (this.height - minY - sizeY);
+    const lifetime = 5000; // 5 seconds before vanishing
+
+    const collectable = new Collectable({ game: this, startX, startY, sizeX, sizeY, lifetime });
+    this.collectables.push(collectable);
+  }
+
+  drawPlayer() {
+    this.player.draw(this.ctx);
+  }
+
+  drawEnemies() {
+    for (let enemy of this.enemies) {
+      enemy.draw(this.ctx);
+    }
+  }
+
+  drawCollectables() {
+    for (let collectable of this.collectables) {
+      collectable.draw(this.ctx);
+    }
+  }
+
+  draw() {
+    if (this.isRunning) {
+      this.drawGame();
+      // render death fade overlay if dying
+      if (this.isDead) {
+        this.drawDeathFade();
+      }
+    } else {
+      this.drawMenu();
+    }
+  }
+
+  drawDeathFade() {
+    const now = performance.now();
+    const elapsed = now - this._deathFadeStartTime;
+    const progress = Math.min(1, elapsed / this._deathFadeDuration);
+    const alpha = progress;
+
+    this.ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  resetToMenu() {
+    // save final score before reset
+    this.finalScore = this.score;
+
+    // reset game state
+    this.isRunning = false;
+    this.isDead = false;
+    this.score = 0;
+    this.enemies = [];
+    this.collectables = [];
+
+    // reset player
+    this.player = new Player({game: this, iputHandler: this.input});
+
+    // reset spawn timers
+    this._nextSpawnTime = performance.now() + this._getNextSpawnDelay();
+    this._nextCollectableSpawnTime = performance.now() + this._getNextCollectableSpawnDelay();
+  }
+
+  drawGame() {
+    this.ctx.drawImage(this.bgImage, 0, 0, this.canvas.width, this.canvas.height);
+
+    // draw blue water tint from top to water surface
+    this.ctx.fillStyle = 'rgba(30, 100, 200, 0.3)';
+    this.ctx.fillRect(0, this.waterSurfaceY, this.canvas.width, this.canvas.height);
+
+    this.drawPlayer();
+    this.drawEnemies();
+    this.drawCollectables();
+    this.drawScore();
+  }
+
+  drawMenu() {
+    // semi-transparent overlay
+    this.ctx.drawImage(this.bgImage, 0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // title
+    this.ctx.save();
+    this.ctx.font = 'bold 48px Arial';
+    this.ctx.fillStyle = '#fff';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText('SCUBA DAVIDE', this.width / 2, this.height / 2 - 80);
+
+    // show score if there was a game played
+    if (this.finalScore > 0) {
+      this.ctx.font = '32px Arial';
+      this.ctx.fillStyle = '#ffd700';
+      this.ctx.fillText(`Final Score: ${this.finalScore}`, this.width / 2, this.height / 2 - 20);
+    }
+
+    // start button
+    const btnWidth = 200;
+    const btnHeight = 60;
+    const btnX = (this.width - btnWidth) / 2;
+    const btnY = this.height / 2 + 20;
+
+    this.ctx.fillStyle = '#4CAF50';
+    this.ctx.fillRect(btnX, btnY, btnWidth, btnHeight);
+    this.ctx.fillStyle = '#fff';
+    this.ctx.font = 'bold 28px Arial';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillText('START', this.width / 2, btnY + btnHeight / 2);
+
+    // store button rect for click detection
+    this._startButtonRect = { x: btnX, y: btnY, width: btnWidth, height: btnHeight };
+    this.ctx.restore();
+  }
+
+  drawScore() {
+    const padding = 20;
+    const fontSize = 24;
+    this.ctx.save();
+    this.ctx.font = `${fontSize}px Arial`;
+    this.ctx.fillStyle = '#000000';
+    this.ctx.textAlign = 'right';
+    this.ctx.fillText(`Score: ${this.score}`, this.width - padding, padding + fontSize);
+    this.ctx.restore();
+  }
+
+  loop() {
+    this.update();
+    this.draw();
+    requestAnimationFrame(this.loop.bind(this));
+  }
+
+  startGame() {
+    this.isRunning = true;
+  }
+
+  handleCanvasClick(event) {
+    if (!this.isRunning && this._startButtonRect) {
+      const rect = this.canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      const btn = this._startButtonRect;
+      if (x >= btn.x && x <= btn.x + btn.width && y >= btn.y && y <= btn.y + btn.height) {
+        this.startGame();
+      }
+    }
+  }
+}
