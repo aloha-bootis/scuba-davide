@@ -7,10 +7,11 @@ export const PLAYER_CONFIG = {
 
   // Movement
   SPEED: 5,
-  // New physics movement parameters (units: px/s^2 for accel/buoyancy, 1/s for drag)
-  ACCELERATION: 1000,
+  // Physics movement parameters (units: px/s^2 for accel/buoyancy, 1/s for drag)
+  ACCELERATION_Y: 20000, // vertical acceleration on key press
+  ACCELERATION_X: 15000, // horizontal acceleration on key press (3/4 of Y)
   DRAG: 2.0,
-  BUOYANCY: 100,
+  BUOYANCY: 250,
 
   // Breath (timings in milliseconds)
   MAX_BREATH: 100,

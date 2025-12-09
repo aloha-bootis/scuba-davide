@@ -5,26 +5,38 @@ import { PLAYER_CONFIG } from '../config/player.js';
 
 export class Player extends Entity {
     
-    constructor({game, iputHandler}) {
+    constructor({game, inputHandler}) {
 
       const startX = game.width * (PLAYER_CONFIG.START_X_RATIO ?? 0.5);
       const startY = game.height * (PLAYER_CONFIG.START_Y_RATIO ?? 0.5);
     
       super({ game, startX, startY, sprite: SPRITES.PLAYER, sizeX: SPRITES.SIZES.PLAYER.width, sizeY: SPRITES.SIZES.PLAYER.height });
 
-      this.keys = iputHandler.keys;
+      // console.log("Creating Player at:", startX, startY);
+
+      this.inputHandler = inputHandler;
+      this.keys = inputHandler.keys;
       // movement physics
       this.speed = PLAYER_CONFIG.SPEED ?? 5;
-      this.acceleration = PLAYER_CONFIG.ACCELERATION ?? 600; // px/s^2
+      this.accelerationX = PLAYER_CONFIG.ACCELERATION_X; // px/s^2
+      this.accelerationY = PLAYER_CONFIG.ACCELERATION_Y; // px/s^2
       this.drag = PLAYER_CONFIG.DRAG ?? 2.0; // 1/s
       this.buoyancy = PLAYER_CONFIG.BUOYANCY ?? 100; // px/s^2 upward
 
       this.vx = 0;
       this.vy = 0;
       this._lastMoveTime = performance.now();
+      // track previous key state to detect presses (not holds)
+      this._prevKeys = {
+        'ArrowUp': false, 'w': false,
+        'ArrowDown': false, 's': false,
+        'ArrowLeft': false, 'a': false,
+        'ArrowRight': false, 'd': false,
+      };
 
       this.maxBreath = PLAYER_CONFIG.MAX_BREATH ?? 100;
       this.breath = this.maxBreath;
+      // console.log("Player max breath:", this.maxBreath, this.breath);
 
       this.breathDecayDuration = PLAYER_CONFIG.BREATH_DECAY_DURATION ?? 20000;
       this.breathDecayRate = this.maxBreath / this.breathDecayDuration;
@@ -32,7 +44,7 @@ export class Player extends Entity {
       // time to refill breath when at surface
       this.breathRefillDuration = PLAYER_CONFIG.BREATH_REFILL_DURATION ?? 1000;
       this.breathRefillRate = this.maxBreath / this.breathRefillDuration;
-      this._lastBreathTime = performance.now();
+      this._lastBreathTime = null;
       // damage invulnerability
       this._lastDamageTime = 0;
       this._damageInvulMs = PLAYER_CONFIG.DAMAGE_INVUL_MS ?? 500; // ms
@@ -44,13 +56,30 @@ export class Player extends Entity {
     const dtMove = Math.max(0, nowMove - this._lastMoveTime) / 1000; // seconds
     this._lastMoveTime = nowMove;
 
-    // input-based acceleration
+    // input-based acceleration (only on key press, not hold)
     let ax = 0;
     let ay = 0;
-    if (this.keys["ArrowUp"] || this.keys["w"]) ay -= this.acceleration;
-    if (this.keys["ArrowDown"] || this.keys["s"]) ay += this.acceleration;
-    if (this.keys["ArrowLeft"] || this.keys["a"]) ax -= this.acceleration;
-    if (this.keys["ArrowRight"] || this.keys["d"]) ax += this.acceleration;
+
+    // Check for key press (transition from false to true)
+    const isUpPress = (this.keys["ArrowUp"] || this.keys["w"]) && !(this._prevKeys["ArrowUp"] || this._prevKeys["w"]);
+    const isDownPress = (this.keys["ArrowDown"] || this.keys["s"]) && !(this._prevKeys["ArrowDown"] || this._prevKeys["s"]);
+    const isLeftPress = (this.keys["ArrowLeft"] || this.keys["a"]) && !(this._prevKeys["ArrowLeft"] || this._prevKeys["a"]);
+    const isRightPress = (this.keys["ArrowRight"] || this.keys["d"]) && !(this._prevKeys["ArrowRight"] || this._prevKeys["d"]);
+
+    if (isUpPress) ay -= this.accelerationY;
+    if (isDownPress) ay += this.accelerationY;
+    if (isLeftPress) ax -= this.accelerationX;
+    if (isRightPress) ax += this.accelerationX;
+
+    // Update previous key state for next frame
+    this._prevKeys["ArrowUp"] = this.keys["ArrowUp"];
+    this._prevKeys["w"] = this.keys["w"];
+    this._prevKeys["ArrowDown"] = this.keys["ArrowDown"];
+    this._prevKeys["s"] = this.keys["s"];
+    this._prevKeys["ArrowLeft"] = this.keys["ArrowLeft"];
+    this._prevKeys["a"] = this.keys["a"];
+    this._prevKeys["ArrowRight"] = this.keys["ArrowRight"];
+    this._prevKeys["d"] = this.keys["d"];
 
     // buoyancy is an upward acceleration (negative Y)
     ay -= this.buoyancy;
@@ -82,11 +111,14 @@ export class Player extends Entity {
     }
 
     const nowBreath = performance.now();
-    const dtBreath = nowBreath - this._lastBreathTime;
+
+    const dtBreath = this._lastBreathTime ? nowBreath - this._lastBreathTime : 0;
     this._lastBreathTime = nowBreath;
 
     // if damaged recently, skip breath update
     const timeSinceDamage = nowBreath - this._lastDamageTime;
+
+    // console.log("£ update: ", this.vx, this.vy, ax, ay, withinX, withinY, this.x, this.y);
 
     // if at water surface, refill breath
     if (this.y <= this.game.waterSurfaceY && timeSinceDamage >= this._damageInvulMs) {
@@ -145,7 +177,7 @@ export class Player extends Entity {
   }
 
   takeDamage(amount) {
-    console.log("Player taking damage:", amount);
+    // console.log("Player taking damage:", amount);
 
     const now = performance.now();
     if (now - this._lastDamageTime < this._damageInvulMs) return false; // still invulnerable

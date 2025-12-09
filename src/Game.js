@@ -17,9 +17,10 @@ export class Game {
 
     this.ctx = canvas.getContext("2d");
 
-    this.input = new inputHandler();
+    this.input = new inputHandler(this);
+    this.input.create();
 
-    this.player = new Player({game: this, iputHandler: this.input});
+    this.player = new Player({game: this, inputHandler: this.input});
     this.enemies = [];
     this.collectables = []; 
     this.entities = [];
@@ -226,11 +227,14 @@ export class Game {
     this.collectables = [];
 
     // reset player
-    this.player = new Player({game: this, iputHandler: this.input});
+    this.player = new Player({game: this, inputHandler: this.input});
 
     // reset spawn timers
     this._nextSpawnTime = performance.now() + this._getNextSpawnDelay();
     this._nextCollectableSpawnTime = performance.now() + this._getNextCollectableSpawnDelay();
+
+    // disable input when returning to menu
+    this.input.disable();
   }
 
   drawGame() {
@@ -297,13 +301,16 @@ export class Game {
   }
 
   loop() {
-    this.update();
+    if (this.isRunning) {
+      this.update();
+    }
     this.draw();
     requestAnimationFrame(this.loop.bind(this));
   }
 
   startGame() {
     this.isRunning = true;
+    this.input.enable();
   }
 
   handleCanvasClick(event) {
