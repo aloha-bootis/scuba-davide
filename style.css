@@ -1,5 +1,5 @@
 /* Full-screen dark background */
-body {
+body, html {
   margin: 0;
   padding: 0;
   background-color: #0a1e3f; /* Dark blue */
@@ -8,6 +8,9 @@ body {
   align-items: center;
   height: 100vh;
   font-family: Arial, sans-serif;
+  overflow: hidden;
+  touch-action: none;  /* IMPORTANT */
+  overscroll-behavior: none;
 }
 
 /* Container to stack title above canvas */
@@ -34,4 +37,5 @@ canvas {
   margin: 0 auto;
   border-radius: 8px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  touch-action: none;  /* IMPORTANT */
 }
