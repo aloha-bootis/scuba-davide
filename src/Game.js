@@ -248,6 +248,7 @@ export class Game {
     this.drawEnemies();
     this.drawCollectables();
     this.drawScore();
+    this.drawVersion();
   }
 
   drawMenu() {
@@ -287,6 +288,8 @@ export class Game {
     // store button rect for click detection
     this._startButtonRect = { x: btnX, y: btnY, width: btnWidth, height: btnHeight };
     this.ctx.restore();
+
+    this.drawVersion();
   }
 
   drawScore() {
@@ -296,7 +299,18 @@ export class Game {
     this.ctx.font = `${fontSize}px Arial`;
     this.ctx.fillStyle = '#000000';
     this.ctx.textAlign = 'right';
-    this.ctx.fillText(`Score: ${this.score}`, this.width - padding, padding + fontSize);
+    this.ctx.fillText(`Score: ${this.score}`, this.width - padding, 2 * padding + fontSize);
+    this.ctx.restore();
+  }
+
+  drawVersion() {
+    const padding = 10;
+    const fontSize = 12;
+    this.ctx.save();
+    this.ctx.font = `${fontSize}px Arial`;
+    this.ctx.fillStyle = '#000000';
+    this.ctx.textAlign = 'right';
+    this.ctx.fillText(`Version: ${GAME_CONFIG.VERSION}`, this.width - padding, padding + fontSize);
     this.ctx.restore();
   }
 
