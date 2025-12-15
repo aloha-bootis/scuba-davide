@@ -5,9 +5,9 @@ export const SPRITES = {
   COLLECTABLE: './assets/egg.png',
   // Default sizes for sprites (used by entity constructors)
   SIZES: {
-    PLAYER: { width: 128, height: 64 },
-    ENEMY: { width: 128, height: 64 },
-    COLLECTABLE: { width: 64, height: 64 },
+    PLAYER: { width: 100, height: 50 },
+    ENEMY: { width: 100, height: 45 },
+    COLLECTABLE: { width: 42, height: 42 },
   },
 };
 

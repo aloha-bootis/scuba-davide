@@ -142,6 +142,54 @@ export class inputHandler {
         }
       }
     };
+
+    // Mouse click controls (behave like touch): mousedown -> press, mouseup -> release
+    this._mouseDownHandler = (e) => {
+      const rect = this._canvas.getBoundingClientRect();
+      const domX = e.clientX - rect.left;
+      const domY = e.clientY - rect.top;
+      // use a synthetic id for mouse
+      const id = 'mouse';
+      if (!this._touchMap[id]) this._touchMap[id] = [];
+
+      // map DOM coords to canvas internal coords (in case canvas is CSS-scaled)
+      const scaleX = this._canvas.width / rect.width;
+      const scaleY = this._canvas.height / rect.height;
+      const x = domX * scaleX;
+      const y = domY * scaleY;
+
+      if (this.game && this.game.player) {
+        const playerX = this.game.player.x;
+        const playerY = this.game.player.y;
+        const dx = x - playerX;
+        const dy = y - playerY;
+        let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+        if (angle < 0) angle += 360;
+
+        const addKey = (k) => {
+          this.keys[k] = true;
+          if (!this._touchMap[id].includes(k)) this._touchMap[id].push(k);
+        };
+
+        if (angle >= 330 || angle < 30) addKey('d');
+        else if (angle >= 30 && angle < 60) { addKey('d'); addKey('s'); }
+        else if (angle >= 60 && angle < 120) addKey('s');
+        else if (angle >= 120 && angle < 150) { addKey('s'); addKey('a'); }
+        else if (angle >= 150 && angle < 210) addKey('a');
+        else if (angle >= 210 && angle < 240) { addKey('a'); addKey('w'); }
+        else if (angle >= 240 && angle < 300) addKey('w');
+        else if (angle >= 300 && angle < 330) { addKey('w'); addKey('d'); }
+      }
+    };
+
+    this._mouseUpHandler = (e) => {
+      const id = 'mouse';
+      const keys = this._touchMap[id];
+      if (keys) {
+        keys.forEach(k => this.keys[k] = false);
+        delete this._touchMap[id];
+      }
+    };
   }
 
   enable() {
@@ -165,6 +213,9 @@ export class inputHandler {
       this._canvas.addEventListener("touchcancel", this._touchEndHandler, {
         passive: false,
       });
+      // mouse handlers
+      this._canvas.addEventListener('mousedown', this._mouseDownHandler);
+      this._canvas.addEventListener('mouseup', this._mouseUpHandler);
     } else {
       // fallback to whole document
       document.addEventListener("touchstart", this._touchStartHandler, {
@@ -176,6 +227,9 @@ export class inputHandler {
       document.addEventListener("touchcancel", this._touchEndHandler, {
         passive: false,
       });
+      // mouse fallback
+      document.addEventListener('mousedown', this._mouseDownHandler);
+      document.addEventListener('mouseup', this._mouseUpHandler);
     }
   }
 
@@ -193,11 +247,17 @@ export class inputHandler {
       this._canvas.removeEventListener("touchstart", this._touchStartHandler);
       this._canvas.removeEventListener("touchend", this._touchEndHandler);
       this._canvas.removeEventListener("touchcancel", this._touchEndHandler);
+      // remove mouse handlers
+      this._canvas.removeEventListener('mousedown', this._mouseDownHandler);
+      this._canvas.removeEventListener('mouseup', this._mouseUpHandler);
     } else {
       // fallback to whole document
       document.removeEventListener("touchstart", this._touchStartHandler);
       document.removeEventListener("touchend", this._touchEndHandler);
       document.removeEventListener("touchcancel", this._touchEndHandler);
+      // remove mouse fallback
+      document.removeEventListener('mousedown', this._mouseDownHandler);
+      document.removeEventListener('mouseup', this._mouseUpHandler);
     }
 
     // Clear all active keys

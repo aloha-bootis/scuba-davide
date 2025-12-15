@@ -330,8 +330,13 @@ export class Game {
   handleCanvasClick(event) {
     if (!this.isRunning && this._startButtonRect) {
       const rect = this.canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+      // Convert DOM coordinates (CSS pixels) to canvas internal coordinates
+      const domX = event.clientX - rect.left;
+      const domY = event.clientY - rect.top;
+      const scaleX = this.canvas.width / rect.width;
+      const scaleY = this.canvas.height / rect.height;
+      const x = domX * scaleX;
+      const y = domY * scaleY;
 
       const btn = this._startButtonRect;
       if (x >= btn.x && x <= btn.x + btn.width && y >= btn.y && y <= btn.y + btn.height) {
