@@ -1,6 +1,7 @@
 import { Player } from "./entities/Player.js";
 import { Enemy } from "./entities/Enemy.js";
 import { Collectable } from "./entities/collectable.js";
+import { BadCollectable } from "./entities/BadCollectable.js";
 import { inputHandler } from "./InputHandler.js";
 import { checkCollision } from "./utils.js";
 import { SPRITES } from './config/sprites.js';
@@ -41,13 +42,18 @@ export class Game {
     this.spawnIntervalVariance = GAME_CONFIG.ENEMY_SPAWN_VARIANCE ?? 1000; // ±ms variance
     this._nextSpawnTime = performance.now() + this._getNextSpawnDelay();
 
-    // collectable spawning configuration
+    // collectable spawning configuration (good collectables)
     this.collectableSpawnIntervalBase = GAME_CONFIG.COLLECTABLE_SPAWN_BASE ?? 3000; // ms base spawn interval
     this.collectableSpawnIntervalVariance = GAME_CONFIG.COLLECTABLE_SPAWN_VARIANCE ?? 1500; // ±ms variance
-    this._nextCollectableSpawnTime = performance.now() + this._getNextCollectableSpawnDelay();
+    this._nextGoodCollectableSpawnTime = performance.now() + this._getNextGoodCollectableSpawnDelay();
+
+    // bad collectable spawning configuration (spawns independently)
+    this.badCollectableSpawnIntervalBase = GAME_CONFIG.BAD_COLLECTABLE_SPAWN_BASE ?? GAME_CONFIG.COLLECTABLE_SPAWN_BASE ?? 3000;
+    this.badCollectableSpawnIntervalVariance = GAME_CONFIG.BAD_COLLECTABLE_SPAWN_VARIANCE ?? GAME_CONFIG.COLLECTABLE_SPAWN_VARIANCE ?? 1500;
+    this._nextBadCollectableSpawnTime = performance.now() + this._getNextBadCollectableSpawnDelay();
 
     this.bgImage = new Image();
-    this.bgImage.src = './assets/background2.png';
+    this.bgImage.src = './assets/background_new2.png';
   }
 
   updatePlayer() {
@@ -87,8 +93,12 @@ export class Game {
 
       // collision with player
       if (checkCollision(this.player, collectable)) {
-        // add to score
-        this.score += 10;
+        // adjust score depending on whether it's a bad collectable
+        if (collectable.isBad) {
+          this.score -= (GAME_CONFIG.BAD_COLLECTABLE_PENALTY ?? 0);
+        } else {
+          this.score += (GAME_CONFIG.COLLECTABLE_SCORE ?? 10);
+        }
         collectable._collected = true;
       }
 
@@ -129,10 +139,16 @@ export class Game {
       this._nextSpawnTime = now + this._getNextSpawnDelay();
     }
 
-    // spawn collectables on a timer
-    if (now >= this._nextCollectableSpawnTime) {
+    // spawn good collectables on their timer
+    if (now >= this._nextGoodCollectableSpawnTime) {
       this.spawnCollectable();
-      this._nextCollectableSpawnTime = now + this._getNextCollectableSpawnDelay();
+      this._nextGoodCollectableSpawnTime = now + this._getNextGoodCollectableSpawnDelay();
+    }
+
+    // spawn bad collectables on their own independent timer
+    if (now >= this._nextBadCollectableSpawnTime) {
+      this.spawnBadCollectable();
+      this._nextBadCollectableSpawnTime = now + this._getNextBadCollectableSpawnDelay();
     }
   }
 
@@ -141,9 +157,13 @@ export class Game {
     return this.spawnIntervalBase + (Math.random() * 2 - 1) * this.spawnIntervalVariance;
   }
 
-  _getNextCollectableSpawnDelay() {
+  _getNextGoodCollectableSpawnDelay() {
     // uniform distribution: base ± variance
     return this.collectableSpawnIntervalBase + (Math.random() * 2 - 1) * this.collectableSpawnIntervalVariance;
+  }
+
+  _getNextBadCollectableSpawnDelay() {
+    return this.badCollectableSpawnIntervalBase + (Math.random() * 2 - 1) * this.badCollectableSpawnIntervalVariance;
   }
 
   spawnEnemy() {
@@ -171,9 +191,21 @@ export class Game {
     // spawn only below 50% of height
     const minY = this.height * 0.5;
     const startY = minY + Math.random() * (this.height - minY - sizeY);
-    const lifetime = 5000; // 5 seconds before vanishing
+    const lifetime = GAME_CONFIG.COLLECTABLE_LIFETIME ?? 5000; // ms before vanishing
 
     const collectable = new Collectable({ game: this, startX, startY, sizeX, sizeY, lifetime });
+    this.collectables.push(collectable);
+  }
+
+  spawnBadCollectable() {
+    const { width: sizeX, height: sizeY } = SPRITES.SIZES.COLLECTABLE;
+    const startX = Math.random() * (this.width - sizeX);
+    // spawn only below 50% of height
+    const minY = this.height * 0.5;
+    const startY = minY + Math.random() * (this.height - minY - sizeY);
+    const lifetime = GAME_CONFIG.COLLECTABLE_LIFETIME ?? 5000; // ms before vanishing
+
+    const collectable = new BadCollectable({ game: this, startX, startY, sizeX, sizeY, lifetime });
     this.collectables.push(collectable);
   }
 
@@ -231,7 +263,8 @@ export class Game {
 
     // reset spawn timers
     this._nextSpawnTime = performance.now() + this._getNextSpawnDelay();
-    this._nextCollectableSpawnTime = performance.now() + this._getNextCollectableSpawnDelay();
+    this._nextGoodCollectableSpawnTime = performance.now() + this._getNextGoodCollectableSpawnDelay();
+    this._nextBadCollectableSpawnTime = performance.now() + this._getNextBadCollectableSpawnDelay();
 
     // disable input when returning to menu
     this.input.disable();

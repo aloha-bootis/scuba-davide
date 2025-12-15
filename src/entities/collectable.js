@@ -1,9 +1,18 @@
 import { Entity } from './Entity.js';
 import { SPRITES } from '../config/sprites.js';
 
+function _randomFishSprite() {
+  const arr = SPRITES.FISH || [];
+  if (arr.length === 0) return SPRITES.COLLECTABLE;
+  const idx = Math.floor(Math.random() * arr.length);
+  return arr[idx];
+}
+
 export class Collectable extends Entity {
-  constructor({ game, startX = 0, startY = 0, sprite = SPRITES.COLLECTABLE, sizeX = SPRITES.SIZES.COLLECTABLE.width, sizeY = SPRITES.SIZES.COLLECTABLE.height, lifetime = 5000 }) {
-    super({ game, startX, startY, sprite, sizeX, sizeY });
+  constructor({ game, startX = 0, startY = 0, sprite = null, sizeX = SPRITES.SIZES.COLLECTABLE.width, sizeY = SPRITES.SIZES.COLLECTABLE.height, lifetime = 5000 }) {
+    // default to a random fish sprite if none provided
+    const chosenSprite = sprite || _randomFishSprite();
+    super({ game, startX, startY, sprite: chosenSprite, sizeX, sizeY });
     this.lifetime = lifetime; // ms before vanishing
     this._spawnTime = performance.now();
     this._collected = false;
