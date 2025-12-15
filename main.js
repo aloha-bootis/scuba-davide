@@ -6,13 +6,18 @@ window.addEventListener("DOMContentLoaded", () => {
   const game = new Game(canvas);
 
   // Responsive canvas styling for different screen sizes
-  function resizeCanvas(canvas) {
+  function resizeCanvas(canvas, gap = 20) {
+    // internal game resolution
     const internalWidth = 800;
     const internalHeight = 450;
 
+    // Reserve a 'gap' of pixels around canvas so it never touches screen edges
+    const availableWidth = Math.max(100, window.innerWidth - gap * 2);
+    const availableHeight = Math.max(100, window.innerHeight - gap * 2);
+
     const scale = Math.min(
-      window.innerWidth / internalWidth,
-      window.innerHeight / internalHeight
+      availableWidth / internalWidth,
+      availableHeight / internalHeight
     );
 
     canvas.style.width = internalWidth * scale + "px";

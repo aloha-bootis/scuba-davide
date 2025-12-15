@@ -17,6 +17,7 @@ body, html {
 .container {
   text-align: center;
   position: relative;
+  padding: 10px;
 }
 
 /* Title styling */
