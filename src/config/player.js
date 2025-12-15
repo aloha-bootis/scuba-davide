@@ -19,7 +19,8 @@ export const PLAYER_CONFIG = {
   BREATH_REFILL_DURATION: 1000, // time to refill from 0 -> full at surface
 
   // Damage invulnerability
-  DAMAGE_INVUL_MS: 500,
+  DAMAGE_INVUL_MS: 600,
+  DAMAGE_COLLECTABLE_INVUL_MS: 250,
 
   ENEMY_DAMAGE: 50,
 };

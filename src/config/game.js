@@ -18,6 +18,8 @@ export const GAME_CONFIG = {
   COLLECTABLE_SCORE: 10,
   // Points subtracted for bad collectable
   BAD_COLLECTABLE_PENALTY: 15,
+  // Breath damage applied when collecting a bad collectable
+  BAD_COLLECTABLE_DAMAGE: 10,
 
   // Death fade duration (ms)
   DEATH_FADE_DURATION: 1500,
@@ -25,7 +27,7 @@ export const GAME_CONFIG = {
   // Enemy collision forgiveness (compenetration fraction)
   ENEMY_COLLISION_COMPENETRATION: 0.1,
 
-  VERSION: '0.1.5'
+  VERSION: '0.1.6'
 };
 
 export default GAME_CONFIG;

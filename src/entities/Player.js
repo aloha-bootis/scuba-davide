@@ -48,6 +48,11 @@ export class Player extends Entity {
       // damage invulnerability
       this._lastDamageTime = 0;
       this._damageInvulMs = PLAYER_CONFIG.DAMAGE_INVUL_MS ?? 500; // ms
+      // track the most recent damage invulnerability duration (permits per-hit overrides)
+      this._lastDamageInvulMs = this._damageInvulMs;
+      // separate flash timestamp/duration so we can visually flash without applying damage
+      this._lastHitFlashTime = 0;
+      this._lastHitFlashDuration = 0;
     }
   
   update() {
@@ -121,7 +126,7 @@ export class Player extends Entity {
     // console.log("£ update: ", this.vx, this.vy, ax, ay, withinX, withinY, this.x, this.y);
 
     // if at water surface, refill breath
-    if (this.y <= this.game.waterSurfaceY && timeSinceDamage >= this._damageInvulMs) {
+    if (this.y <= this.game.waterSurfaceY && timeSinceDamage >= this._lastDamageInvulMs) {
       this.breath = Math.min(this.maxBreath, this.breath + dtBreath * this.breathRefillRate);
     } else {
       // decay breath over time
@@ -132,13 +137,15 @@ export class Player extends Entity {
   draw(ctx) {
     super.draw(ctx);
 
-    // red flash during damage immunity
+    // red flash during damage immunity or when a visual flash was requested
     const now = performance.now();
     const timeSinceDamage = now - this._lastDamageTime;
-    if (timeSinceDamage < this._damageInvulMs) {
-      // flash intensity based on time (blink effect)
+    const timeSinceFlash = now - this._lastHitFlashTime;
+      if (timeSinceDamage < this._lastDamageInvulMs || timeSinceFlash < this._lastHitFlashDuration) {
+      // base the blink on whichever timestamp is active
+      const t = timeSinceDamage < this._lastDamageInvulMs ? timeSinceDamage : timeSinceFlash;
       const blinkSpeed = 0.01; // controls blink frequency
-      const flash = Math.sin(timeSinceDamage * blinkSpeed * Math.PI) > 0 ? 0.6 : 0;
+      const flash = Math.sin(t * blinkSpeed * Math.PI) > 0 ? 0.6 : 0;
       ctx.save();
       ctx.fillStyle = `rgba(255, 0, 0, ${flash})`;
       ctx.fillRect(this.x, this.y, this.sizeX, this.sizeY);
@@ -176,15 +183,23 @@ export class Player extends Entity {
     ctx.restore();
   }
 
-  takeDamage(amount) {
+  takeDamage(amount, invulMsOverride) {
     // console.log("Player taking damage:", amount);
 
     const now = performance.now();
-    if (now - this._lastDamageTime < this._damageInvulMs) return false; // still invulnerable
+    if (now - this._lastDamageTime < this._lastDamageInvulMs) return false; // still invulnerable
 
     this._lastDamageTime = now;
+    // allow per-hit invulnerability duration override (e.g., half-duration for bad collectables)
+    this._lastDamageInvulMs = typeof invulMsOverride === 'number' ? invulMsOverride : this._damageInvulMs;
     this.breath = Math.max(0, this.breath - amount);
     return true;
+  }
+
+  // request a visual-only hit flash (optionally specify duration in ms)
+  flash(durationMs) {
+    this._lastHitFlashTime = performance.now();
+    this._lastHitFlashDuration = typeof durationMs === 'number' ? durationMs : this._damageInvulMs;
   }
 
 };

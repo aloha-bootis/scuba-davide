@@ -96,6 +96,12 @@ export class Game {
         // adjust score depending on whether it's a bad collectable
         if (collectable.isBad) {
           this.score -= (GAME_CONFIG.BAD_COLLECTABLE_PENALTY ?? 0);
+          // apply breath damage for bad collectable and use a shorter invulnerability window
+          const dmg = GAME_CONFIG.BAD_COLLECTABLE_DAMAGE;
+          const invulnTime = PLAYER_CONFIG.DAMAGE_COLLECTABLE_INVUL_MS;
+          this.player.takeDamage(dmg, invulnTime);
+          // always show a shorter flash for bad collectables (even if damage was blocked)
+          if (this.player && typeof this.player.flash === 'function') this.player.flash(invulnTime);
         } else {
           this.score += (GAME_CONFIG.COLLECTABLE_SCORE ?? 10);
         }
