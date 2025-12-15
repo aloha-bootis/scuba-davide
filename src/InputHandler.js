@@ -16,7 +16,7 @@ export class inputHandler {
     this._canvas = document.getElementById("game");
 
     // Create arrow function handlers to preserve 'this' binding
-    this._keydownHandler = (e) => this.keys[e.key] = true;
+    this._keydownHandler = (e) => (this.keys[e.key] = true);
     this._keyupHandler = (e) => (this.keys[e.key] = false);
 
     // Mobile touch controls: angle-based relative to player position
@@ -25,10 +25,17 @@ export class inputHandler {
       e.preventDefault();
       const rect = this._canvas.getBoundingClientRect();
 
+      const scaleX = this._canvas.width / rect.width;
+      const scaleY = this._canvas.height / rect.height;
+
       for (let i = 0; i < e.changedTouches.length; i++) {
         const t = e.changedTouches[i];
-        const touchX = t.clientX - rect.left;
-        const touchY = t.clientY - rect.top;
+
+        const touchX = (t.clientX - rect.left) * scaleX;
+        const touchY = (t.clientY - rect.top) * scaleY;
+
+        // const touchX = t.clientX - rect.left;
+        // const touchY = t.clientY - rect.top;
 
         // Initialize array of keys for this touch ID
         if (!this._touchMap[t.identifier]) {
@@ -43,11 +50,11 @@ export class inputHandler {
           // Calculate angle from player to touch point
           const dx = touchX - playerX;
           const dy = touchY - playerY;
-          
+
           // Calculate angle in degrees (0° = right, 90° = down, 270° = up)
           // Using Math.atan2(dy, dx) which returns radians
           let angle = Math.atan2(dy, dx) * (180 / Math.PI);
-          
+
           // Normalize angle to 0-360 range
           if (angle < 0) angle += 360;
 
@@ -63,7 +70,7 @@ export class inputHandler {
           // Down-Right (45°): 30-60°
           else if (angle >= 30 && angle < 60) {
             const keys = ["d", "s"];
-            keys.forEach(key => {
+            keys.forEach((key) => {
               this.keys[key] = true;
               if (!this._touchMap[t.identifier].includes(key)) {
                 this._touchMap[t.identifier].push(key);
@@ -81,7 +88,7 @@ export class inputHandler {
           // Down-Left (135°): 120-150°
           else if (angle >= 120 && angle < 150) {
             const keys = ["s", "a"];
-            keys.forEach(key => {
+            keys.forEach((key) => {
               this.keys[key] = true;
               if (!this._touchMap[t.identifier].includes(key)) {
                 this._touchMap[t.identifier].push(key);
@@ -99,7 +106,7 @@ export class inputHandler {
           // Up-Left (225°): 210-240°
           else if (angle >= 210 && angle < 240) {
             const keys = ["a", "w"];
-            keys.forEach(key => {
+            keys.forEach((key) => {
               this.keys[key] = true;
               if (!this._touchMap[t.identifier].includes(key)) {
                 this._touchMap[t.identifier].push(key);
@@ -117,7 +124,7 @@ export class inputHandler {
           // Up-Right (315°): 300-330°
           else if (angle >= 300 && angle < 330) {
             const keys = ["w", "d"];
-            keys.forEach(key => {
+            keys.forEach((key) => {
               this.keys[key] = true;
               if (!this._touchMap[t.identifier].includes(key)) {
                 this._touchMap[t.identifier].push(key);
@@ -137,7 +144,7 @@ export class inputHandler {
         const keys = this._touchMap[t.identifier];
         if (keys) {
           // Release each key that was mapped to this touch
-          keys.forEach(key => this.keys[key] = false);
+          keys.forEach((key) => (this.keys[key] = false));
           delete this._touchMap[t.identifier];
         }
       }
@@ -149,7 +156,7 @@ export class inputHandler {
       const domX = e.clientX - rect.left;
       const domY = e.clientY - rect.top;
       // use a synthetic id for mouse
-      const id = 'mouse';
+      const id = "mouse";
       if (!this._touchMap[id]) this._touchMap[id] = [];
 
       // map DOM coords to canvas internal coords (in case canvas is CSS-scaled)
@@ -171,22 +178,31 @@ export class inputHandler {
           if (!this._touchMap[id].includes(k)) this._touchMap[id].push(k);
         };
 
-        if (angle >= 330 || angle < 30) addKey('d');
-        else if (angle >= 30 && angle < 60) { addKey('d'); addKey('s'); }
-        else if (angle >= 60 && angle < 120) addKey('s');
-        else if (angle >= 120 && angle < 150) { addKey('s'); addKey('a'); }
-        else if (angle >= 150 && angle < 210) addKey('a');
-        else if (angle >= 210 && angle < 240) { addKey('a'); addKey('w'); }
-        else if (angle >= 240 && angle < 300) addKey('w');
-        else if (angle >= 300 && angle < 330) { addKey('w'); addKey('d'); }
+        if (angle >= 330 || angle < 30) addKey("d");
+        else if (angle >= 30 && angle < 60) {
+          addKey("d");
+          addKey("s");
+        } else if (angle >= 60 && angle < 120) addKey("s");
+        else if (angle >= 120 && angle < 150) {
+          addKey("s");
+          addKey("a");
+        } else if (angle >= 150 && angle < 210) addKey("a");
+        else if (angle >= 210 && angle < 240) {
+          addKey("a");
+          addKey("w");
+        } else if (angle >= 240 && angle < 300) addKey("w");
+        else if (angle >= 300 && angle < 330) {
+          addKey("w");
+          addKey("d");
+        }
       }
     };
 
     this._mouseUpHandler = (e) => {
-      const id = 'mouse';
+      const id = "mouse";
       const keys = this._touchMap[id];
       if (keys) {
-        keys.forEach(k => this.keys[k] = false);
+        keys.forEach((k) => (this.keys[k] = false));
         delete this._touchMap[id];
       }
     };
@@ -214,8 +230,8 @@ export class inputHandler {
         passive: false,
       });
       // mouse handlers
-      this._canvas.addEventListener('mousedown', this._mouseDownHandler);
-      this._canvas.addEventListener('mouseup', this._mouseUpHandler);
+      this._canvas.addEventListener("mousedown", this._mouseDownHandler);
+      this._canvas.addEventListener("mouseup", this._mouseUpHandler);
     } else {
       // fallback to whole document
       document.addEventListener("touchstart", this._touchStartHandler, {
@@ -228,8 +244,8 @@ export class inputHandler {
         passive: false,
       });
       // mouse fallback
-      document.addEventListener('mousedown', this._mouseDownHandler);
-      document.addEventListener('mouseup', this._mouseUpHandler);
+      document.addEventListener("mousedown", this._mouseDownHandler);
+      document.addEventListener("mouseup", this._mouseUpHandler);
     }
   }
 
@@ -248,16 +264,16 @@ export class inputHandler {
       this._canvas.removeEventListener("touchend", this._touchEndHandler);
       this._canvas.removeEventListener("touchcancel", this._touchEndHandler);
       // remove mouse handlers
-      this._canvas.removeEventListener('mousedown', this._mouseDownHandler);
-      this._canvas.removeEventListener('mouseup', this._mouseUpHandler);
+      this._canvas.removeEventListener("mousedown", this._mouseDownHandler);
+      this._canvas.removeEventListener("mouseup", this._mouseUpHandler);
     } else {
       // fallback to whole document
       document.removeEventListener("touchstart", this._touchStartHandler);
       document.removeEventListener("touchend", this._touchEndHandler);
       document.removeEventListener("touchcancel", this._touchEndHandler);
       // remove mouse fallback
-      document.removeEventListener('mousedown', this._mouseDownHandler);
-      document.removeEventListener('mouseup', this._mouseUpHandler);
+      document.removeEventListener("mousedown", this._mouseDownHandler);
+      document.removeEventListener("mouseup", this._mouseUpHandler);
     }
 
     // Clear all active keys
