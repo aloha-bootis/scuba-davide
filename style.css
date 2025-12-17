@@ -42,3 +42,151 @@ canvas {
   touch-action: none;  /* IMPORTANT */
   -ms-touch-action: none;
 }
+
+/* Overlay buttons that live on top of the canvas (centered) */
+.overlay {
+  position: absolute;
+  inset: 0; /* cover the container */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  pointer-events: none; /* let children opt-in */
+}
+
+/* allow hiding the entire overlay by toggling the 'hidden' class on #menu-overlay */
+.overlay.hidden {
+  display: none !important;
+}
+
+.menu-panel {
+  pointer-events: auto;
+  width: calc(100%);
+  /* max-width: 880px; */
+  height: 75%; /* occupy about 3/4 of the canvas */
+  margin-top: 8px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  border-radius: 10px;
+  padding: 40px;
+  box-sizing: border-box;
+  overflow: auto;
+  text-align: left;
+  z-index: 10;
+}
+
+.menu-panel h2 { margin-top: 0; }
+
+/* allow toggling visibility of the menu panel only */
+.menu-panel.hidden {
+  display: none !important;
+}
+
+
+/* submit area holds input + button centered within overlay */
+.submit-area {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  z-index: 0;
+  pointer-events: auto;
+}
+.submit-area.hidden { display: none !important; }
+.submit-input {
+  padding: 12px 14px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  min-width: 220px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+.submit-input:focus { outline: 2px solid rgba(255,255,255,0.9); }
+
+.submit-msg {
+  margin-top: 6px;
+  color: #b3ffb3; /* success green */
+  font-size: 14px;
+  text-align: center;
+}
+.submit-msg.error { color: #ffb3b3; }
+.submit-msg.hidden { display: none !important; }
+
+/* centered submit button shown after a finished run with a non-zero score */
+.submit-btn {
+  pointer-events: auto;
+  padding: 14px 20px;
+  font-size: 18px;
+  border-radius: 8px;
+}
+.submit-btn.hidden { display: none !important; }
+
+.overlay-buttons {
+  pointer-events: auto;
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 6%; /* keep the buttons in the lower ~quarter */
+}
+
+/* Scoreboard table styling inside the menu panel */
+.scoreboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+.scoreboard-table th, .scoreboard-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  text-align: left;
+}
+.scoreboard-table thead th {
+  color: #ffd700;
+  font-weight: bold;
+}
+.scoreboard-table tbody tr:nth-child(odd) { background: rgba(255,255,255,0.02); }
+
+.overlay-btn {
+  pointer-events: auto;
+  padding: 12px 20px;
+  font-size: 18px;
+  border-radius: 8px;
+  background: #0a1e3f;
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+}
+
+.overlay-btn.active {
+  outline: 2px solid rgba(255,255,255,0.95);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.45);
+}
+
+.overlay-btn.secondary {
+  background: #0a1e3f;
+}
+
+.overlay-btn.tertiary {
+  background: #0a1e3f;
+}
+
+.overlay-buttons.hidden {
+  display: none;
+}
+
+.hidden-visibility {
+  visibility: hidden;
+}
+
+.hidden {
+  display: none !important;
+}
+

@@ -55,7 +55,9 @@ export class Game {
     this._nextBadCollectableSpawnTime = performance.now() + this._getNextBadCollectableSpawnDelay();
 
     this.bgImage = new Image();
-    this.bgImage.src = './assets/background_new2.png';
+    this.bgImage.src = './assets/background/background_new2.png';
+    // cache menu overlay element (optional)
+    this.menuOverlay = document.getElementById('menu-overlay');
   }
 
   updatePlayer() {
@@ -296,6 +298,14 @@ export class Game {
 
     // disable input when returning to menu
     this.input.disable();
+    // show DOM overlay buttons again
+    this.menuOverlay.classList.remove('hidden');
+    // notify external UI that we've returned to menu and provide final score
+    try {
+      document.dispatchEvent(new CustomEvent('game:resetToMenu', { detail: { finalScore: this.finalScore } }));
+    } catch (e) {
+      // ignore if document isn't available in some test harnesses
+    }
   }
 
   drawGame() {
@@ -328,28 +338,28 @@ export class Game {
     this.ctx.fillText('SCUBA DAVIDE', this.width / 2, this.height / 2 - 80);
 
     // show score if there was a game played
-    if (this.finalScore > 0) {
+    if (this.finalScore !== 0) {
       this.ctx.font = '32px Arial';
       this.ctx.fillStyle = '#ffd700';
       this.ctx.fillText(`Final Score: ${this.finalScore}`, this.width / 2, this.height / 2 - 20);
     }
 
     // start button
-    const btnWidth = 200;
-    const btnHeight = 60;
-    const btnX = (this.width - btnWidth) / 2;
-    const btnY = this.height / 2 + 20;
+    // const btnWidth = 200;
+    // const btnHeight = 60;
+    // const btnX = (this.width - btnWidth) / 2;
+    // const btnY = this.height / 2 + 20;
 
-    this.ctx.fillStyle = '#4CAF50';
-    this.ctx.fillRect(btnX, btnY, btnWidth, btnHeight);
-    this.ctx.fillStyle = '#fff';
-    this.ctx.font = 'bold 28px Arial';
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'middle';
-    this.ctx.fillText('START', this.width / 2, btnY + btnHeight / 2);
+    // this.ctx.fillStyle = '#4CAF50';
+    // this.ctx.fillRect(btnX, btnY, btnWidth, btnHeight);
+    // this.ctx.fillStyle = '#fff';
+    // this.ctx.font = 'bold 28px Arial';
+    // this.ctx.textAlign = 'center';
+    // this.ctx.textBaseline = 'middle';
+    // this.ctx.fillText('START', this.width / 2, btnY + btnHeight / 2);
 
-    // store button rect for click detection
-    this._startButtonRect = { x: btnX, y: btnY, width: btnWidth, height: btnHeight };
+    // // store button rect for click detection
+    // this._startButtonRect = { x: btnX, y: btnY, width: btnWidth, height: btnHeight };
     this.ctx.restore();
 
     this.drawVersion();
@@ -388,6 +398,9 @@ export class Game {
   startGame() {
     this.isRunning = true;
     this.input.enable();
+    // hide DOM overlay buttons when starting
+    console.log("Hiding menu overlay", this.menuOverlay);
+    this.menuOverlay.classList.add('hidden');
   }
 
   handleCanvasClick(event) {
