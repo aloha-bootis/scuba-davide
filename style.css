@@ -9,8 +9,9 @@ body, html {
   height: 100vh;
   font-family: Arial, sans-serif;
   overflow: hidden;
-  touch-action: none;  /* IMPORTANT */
+  touch-action: none; 
   overscroll-behavior: none;
+  -ms-touch-action: none;
 }
 
 /* Container to stack title above canvas */
@@ -39,4 +40,5 @@ canvas {
   border-radius: 8px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   touch-action: none;  /* IMPORTANT */
+  -ms-touch-action: none;
 }
