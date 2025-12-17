@@ -27,7 +27,7 @@ export const GAME_CONFIG = {
   // Enemy collision forgiveness (compenetration fraction)
   ENEMY_COLLISION_COMPENETRATION: 0.1,
 
-  VERSION: '0.1.6'
+  VERSION: '0.1.7'
 };
 
 export default GAME_CONFIG;

@@ -1,6 +1,6 @@
 // Centralized sprite paths (enumerator-like) for game entities
 export const SPRITES = {
-  PLAYER: './assets/scuba.png',
+  PLAYER: './assets/scuba2.png',
   ENEMY: './assets/submarine_finanza1.png',
   COLLECTABLE: './assets/egg.png',
   // fish sprites can be used as collectables (randomly chosen)
@@ -8,6 +8,7 @@ export const SPRITES = {
     './assets/cod_fish.png',
     './assets/salmon_fish.png',
     './assets/tropical_fish.png',
+    './assets/egg.png'
   ],
   // bad items that penalize player when collected
   BAD: [

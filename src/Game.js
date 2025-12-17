@@ -3,6 +3,7 @@ import { Enemy } from "./entities/Enemy.js";
 import { Collectable } from "./entities/collectable.js";
 import { BadCollectable } from "./entities/BadCollectable.js";
 import { inputHandler } from "./InputHandler.js";
+import { Status } from './entities/Status.js';
 import { checkCollision } from "./utils.js";
 import { SPRITES } from './config/sprites.js';
 import { GAME_CONFIG } from './config/game.js';
@@ -25,6 +26,7 @@ export class Game {
     this.enemies = [];
     this.collectables = []; 
     this.entities = [];
+    this.status = new Status(this.ctx, this.player);
 
     // game state
     this.score = 0;
@@ -231,6 +233,25 @@ export class Game {
     }
   }
 
+  drawStatus() {
+       // draw player status icon at top-right
+    const paddingX = 16;
+    const paddingY = 16;
+    const iconSize = 64; // px (internal canvas pixels)
+    const ix = paddingX;
+    const iy = paddingY;
+    // background for visibility
+    this.ctx.save();
+    // this.ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    // this.ctx.fillRect(ix - 4, iy - 4, iconSize + 8, iconSize + 8);
+    if (this.statusImage && this.statusImage.complete) {
+      this.ctx.drawImage(this.statusImage, ix, iy, iconSize, iconSize);
+    }
+
+    this.ctx.restore();
+  }
+
+
   draw() {
     if (this.isRunning) {
       this.drawGame();
@@ -266,6 +287,7 @@ export class Game {
 
     // reset player
     this.player = new Player({game: this, inputHandler: this.input});
+    this.status.reset(this.player);
 
     // reset spawn timers
     this._nextSpawnTime = performance.now() + this._getNextSpawnDelay();
@@ -288,6 +310,8 @@ export class Game {
     this.drawCollectables();
     this.drawScore();
     this.drawVersion();
+    // delegate status drawing to Status instance
+    this.status.drawStatus();
   }
 
   drawMenu() {
