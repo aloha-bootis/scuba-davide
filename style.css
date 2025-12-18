@@ -158,7 +158,7 @@ canvas {
   padding: clamp(8px, 1.6vw, 14px) clamp(12px, 2.4vw, 20px);
   font-size: clamp(14px, 2.4vw, 18px);
   border-radius: 8px;
-  background: #0a1e3f;
+  background: #0e57cd;
   color: white;
   border: none;
   cursor: pointer;
@@ -173,11 +173,11 @@ canvas {
 }
 
 .overlay-btn.secondary {
-  background: #0a1e3f;
+  background: #0e57cd;
 }
 
 .overlay-btn.tertiary {
-  background: #0a1e3f;
+  background: #0e57cd;
 }
 
 .overlay-buttons.hidden {
@@ -195,17 +195,17 @@ canvas {
     padding-bottom: 10%;
   }
   .overlay-btn {
-    flex: 1 1 100%;
+    /* flex: 1 1 100%; */
     min-width: 0;
-    font-size: clamp(14px, 3.5vw, 16px);
+    font-size: clamp(7px, 3.5vw, 18px);
     padding: 10px 12px;
   }
   .menu-panel {
-    padding: clamp(16px, 4vw, 28px);
+    padding: clamp(7px, 2vw, 14px);
     height: auto;
   }
   .submit-area {
-    flex-direction: column;
+    /* flex-direction: column; */
     gap: 8px;
   }
   .submit-input, .submit-btn {
