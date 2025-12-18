@@ -49,7 +49,8 @@ canvas {
   inset: 0; /* cover the container */
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  /* panel fills the space and buttons remain pinned to bottom */
+  justify-content: space-between;
   align-items: center;
   pointer-events: none; /* let children opt-in */
 }
@@ -63,8 +64,9 @@ canvas {
   pointer-events: auto;
   width: calc(100%);
   /* max-width: 880px; */
-  height: 75%; /* occupy about 3/4 of the canvas */
-  margin-top: 8px;
+  /* allow the panel to expand and fill space above the buttons */
+  flex: 1 1 auto;
+  margin: 8px 0 12px 0;
   background: rgba(0, 0, 0, 0.85);
   color: #fff;
   border-radius: 10px;
@@ -86,7 +88,7 @@ canvas {
 /* submit area holds input + button centered within overlay */
 .submit-area {
   position: absolute;
-  top: 55%;
+  top: 60%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
@@ -128,11 +130,11 @@ canvas {
   pointer-events: auto;
   display: flex;
   gap: 12px;
-  margin-top: 12px;
+  margin: 0 0 18px 0;
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding-bottom: 6%; /* keep the buttons in the lower ~quarter */
+  padding-bottom: 2%; /* keep the buttons comfortably above bottom */
 }
 
 /* Scoreboard table styling inside the menu panel */
@@ -192,25 +194,38 @@ canvas {
 @media (max-width: 480px) {
   .overlay-buttons {
     gap: 8px;
-    padding-bottom: 10%;
+    padding-bottom: 2%;
   }
   .overlay-btn {
-    /* flex: 1 1 100%; */
+    /* even smaller on very small screens */
     min-width: 0;
-    font-size: clamp(7px, 3.5vw, 18px);
-    padding: 10px 12px;
+    font-size: 11px;
+    padding: 6px 8px;
   }
   .menu-panel {
-    padding: clamp(7px, 2vw, 14px);
+    padding: clamp(6px, 1.5vw, 10px);
     height: auto;
   }
   .submit-area {
     /* flex-direction: column; */
-    gap: 8px;
+    gap: 4px;
   }
-  .submit-input, .submit-btn {
+  .submit-input {
     min-width: 0;
-    width: 100%;
+    /* width: 100%; */
+    font-size: 12px;
+    padding: 6px 8px;
+    height: auto;           /* let height be based on padding + font */
+    box-sizing: border-box; /* ensure padding included in width/height */
+  }
+
+  .submit-btn {
+    min-width: 0;
+    /* width: 100%; */
+    font-size: 11px;
+    padding: 6px 8px;
+    height: auto;           /* let height be based on padding + font */
+    box-sizing: border-box; /* tighter */
   }
 }
 

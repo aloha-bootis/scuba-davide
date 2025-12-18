@@ -269,7 +269,7 @@ window.addEventListener("DOMContentLoaded", () => {
   // listen for game reset events to show/hide the submit button
   document.addEventListener('game:resetToMenu', (e) => {
     const finalScore = e?.detail?.finalScore ?? 0;
-    if (finalScore && finalScore !== 0) {
+    if (finalScore) {
       showSubmit(finalScore);
     } else {
       hideSubmit();
