@@ -25,9 +25,9 @@ export const GAME_CONFIG = {
   DEATH_FADE_DURATION: 1500,
 
   // Enemy collision forgiveness (compenetration fraction)
-  ENEMY_COLLISION_COMPENETRATION: 0.1,
+  ENEMY_COLLISION_COMPENETRATION: 0.2,
 
-  VERSION: '0.1.13'
+  VERSION: '0.1.14'
 };
 
 export default GAME_CONFIG;

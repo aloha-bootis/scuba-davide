@@ -1,6 +1,7 @@
 export class Status {
-  constructor(ctx, player) {
+  constructor(canvas, ctx, player) {
     this.ctx = ctx;
+    this.canvas = canvas;
 
     // load images
     this.statusImages = {
@@ -34,11 +35,12 @@ export class Status {
 
   drawStatus() {
     // draw player status icon at top-right
-    const paddingX = 16;
+    const paddingX = 24;
     const paddingY = 16;
     const iconSize = 64; // px (internal canvas pixels)
     const ix = paddingX;
     const iy = paddingY;
+    const rightSpace = paddingX + 24 * 6 + ix;
 
     // health-based overrides: if player's breath is low, show specific static image
     let healthState = null;
@@ -85,7 +87,7 @@ export class Status {
     // this.ctx.fillStyle = 'rgba(255,255,255,0.85)';
     // this.ctx.fillRect(ix - 4, iy - 4, iconSize + 8, iconSize + 8);
     if (this.statusImage && this.statusImage.complete) {
-      this.ctx.drawImage(this.statusImage, ix, iy, iconSize, iconSize);
+      this.ctx.drawImage(this.statusImage, this.canvas.width - rightSpace, iy, iconSize, iconSize);
     }
     this.ctx.restore();
   }

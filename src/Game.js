@@ -26,7 +26,7 @@ export class Game {
     this.enemies = [];
     this.collectables = []; 
     this.entities = [];
-    this.status = new Status(this.ctx, this.player);
+    this.status = new Status(this.canvas, this.ctx, this.player);
 
     // game state
     this.score = 0;
@@ -235,25 +235,6 @@ export class Game {
     }
   }
 
-  drawStatus() {
-       // draw player status icon at top-right
-    const paddingX = 16;
-    const paddingY = 16;
-    const iconSize = 64; // px (internal canvas pixels)
-    const ix = paddingX;
-    const iy = paddingY;
-    // background for visibility
-    this.ctx.save();
-    // this.ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    // this.ctx.fillRect(ix - 4, iy - 4, iconSize + 8, iconSize + 8);
-    if (this.statusImage && this.statusImage.complete) {
-      this.ctx.drawImage(this.statusImage, ix, iy, iconSize, iconSize);
-    }
-
-    this.ctx.restore();
-  }
-
-
   draw() {
     if (this.isRunning) {
       this.drawGame();
@@ -366,13 +347,14 @@ export class Game {
   }
 
   drawScore() {
-    const padding = 20;
+    const paddingX = 10;
+    const paddingY = this.height / 10;
     const fontSize = 24;
     this.ctx.save();
-    this.ctx.font = `${fontSize}px Arial`;
-    this.ctx.fillStyle = '#000000';
+    this.ctx.font = `bold ${fontSize}px Arial`;
+    this.ctx.fillStyle = '#f96705ff';
     this.ctx.textAlign = 'right';
-    this.ctx.fillText(`Score: ${this.score}`, this.width - padding, 2 * padding + fontSize);
+    this.ctx.fillText(`Score: ${this.score}`, this.width - paddingX, paddingY + fontSize/2);
     this.ctx.restore();
   }
 
@@ -383,7 +365,9 @@ export class Game {
     this.ctx.font = `${fontSize}px Arial`;
     this.ctx.fillStyle = '#000000';
     this.ctx.textAlign = 'right';
-    this.ctx.fillText(`Version: ${GAME_CONFIG.VERSION}`, this.width - padding, padding + fontSize);
+
+    this.ctx.textBaseline = 'bottom';
+    this.ctx.fillText(`Version: ${GAME_CONFIG.VERSION}`, this.width - padding, this.height - padding);
     this.ctx.restore();
   }
 
