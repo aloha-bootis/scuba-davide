@@ -143,6 +143,19 @@ canvas {
   border-collapse: collapse;
   margin-top: 8px;
 }
+
+/* Spinner for loading scoreboard */
+.spinner {
+  display: block;
+  margin: 40px auto 24px auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 4px solid rgba(255,255,255,0.18);
+  border-top-color: #fff;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 .scoreboard-table th, .scoreboard-table td {
   padding: 8px 10px;
   border-bottom: 1px solid rgba(255,255,255,0.08);

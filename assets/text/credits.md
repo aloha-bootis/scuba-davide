@@ -1,13 +1,13 @@
-Scuba Davide status sprites: Cassandra Gasparrino ❤️
+- Scuba Davide status sprites: Cassandra Gasparrino ❤️
 
-Sea urchin sprite: Ceciliaaaa 👾
+- Sea urchin sprite: Ceciliaaaa 👾
 
-water background: https://craftpix.net/freebies/free-underwater-world-pixel-art-backgrounds/?num=1&count=29&sq=underwater&pos=2
+- Water background: https://craftpix.net/freebies/free-underwater-world-pixel-art-backgrounds/?num=1&count=29&sq=underwater&pos=2
 
-sky background: https://craftpix.net/freebies/free-summer-pixel-art-backgrounds/?num=1&count=18&sq=sky%20clouds%20summer&pos=0z
+- Sky background: https://craftpix.net/freebies/free-summer-pixel-art-backgrounds/?num=1&count=18&sq=sky%20clouds%20summer&pos=0z
 
-submarine sprite: stolen from shutterstock + modified with GIMP
+- Submarine sprite: stolen from shutterstock + modified with GIMP
 
-scuba davide sprite: stolen from shutterstock + modified with GIMP
+- Scuba davide sprite: stolen from shutterstock + modified with GIMP
 
-collectables sprites: Minecraft
+- Collectables sprites: Minecraft
