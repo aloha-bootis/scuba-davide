@@ -3,6 +3,7 @@ import { Game } from "./src/Game.js";
 window.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("game");
   const game = new Game(canvas);
+  const apiLink = "https://script.google.com/macros/s/AKfycbymEwgiWVSxm5NNXmNJ2ZWPFEKps_Lb0sa2cvmsqVUvWIQIY5UETN8AQPzeXV-u1EUdAg/exec";
 
   // Responsive canvas styling for different screen sizes
   function resizeCanvas(canvas, gap = 20) {
@@ -67,7 +68,7 @@ window.addEventListener("DOMContentLoaded", () => {
     // prepare input and focus
     if (submitInput) {
       submitInput.value = '';
-      submitInput.focus();
+      // submitInput.focus();
       if (btnSubmit) btnSubmit.disabled = true;
       // enable/disable submit button based on input
       submitInput.addEventListener('input', () => {
@@ -118,7 +119,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const name = (submitInput?.value || '').trim();
         if (!name) {
           if (submitMsg) { 
-            submitMsg.textContent = 'Please enter your name'; 
+            submitMsg.textContent = 'Please enter your alias'; 
             submitMsg.classList.remove('hidden'); 
             submitMsg.classList.add('error'); 
           }
@@ -127,11 +128,24 @@ window.addEventListener("DOMContentLoaded", () => {
         }
 
         // load existing stored scores, append and persist
-        const raw = localStorage.getItem('scuba_scores');
-        const arr = raw ? JSON.parse(raw) : [];
-        arr.push({ name: String(name).slice(0, 32), points: lastScore, ts: Date.now() });
+        // const raw = localStorage.getItem('scuba_scores');
+        // const arr = raw ? JSON.parse(raw) : [];
+        // arr.push({ name: String(name).slice(0, 32), score: lastScore, timestamp: Date.now() });
+
         // keep only a reasonable number
-        localStorage.setItem('scuba_scores', JSON.stringify(arr.slice(-200)));
+        //localStorage.setItem('scuba_scores', JSON.stringify(arr.slice(-200)));
+
+        const payload = { name, score: lastScore, timestamp: Date.now() };
+        console.log("payload: ", payload);
+
+        // try to submit to remote API
+        const res = await fetch(apiLink, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        
+        if (!res.ok) throw new Error('Failed to submit score');
 
 
         hideSubmitInput();
@@ -225,40 +239,41 @@ window.addEventListener("DOMContentLoaded", () => {
       }
 
         try {
-          const res = await fetch('./assets/text/scoreboard.json');
+          const res = await fetch(apiLink);
           if (!res.ok) throw new Error('Failed to load scoreboard');
           const data = await res.json();
+          console.log("Scoreboard data:", data);
           // merge with any locally submitted scores stored in localStorage
           const localRaw = localStorage.getItem('scuba_scores');
           const local = localRaw ? JSON.parse(localRaw) : [];
           const merged = (data.scores || []).concat(local || []);
-          const rows = merged.slice().sort((a, b) => b.points - a.points);
+          const rows = data.slice().sort((a, b) => b.points - a.points);
         // build table
-        const table = document.createElement("table");
-        table.className = "scoreboard-table";
-        const thead = document.createElement("thead");
-        thead.innerHTML = "<tr><th>Rank</th><th>Name</th><th>Points</th></tr>";
-        const tbody = document.createElement("tbody");
-        rows.forEach((r, idx) => {
-          const tr = document.createElement("tr");
-          const rankTd = document.createElement("td");
-          rankTd.textContent = String(idx + 1);
-          const nameTd = document.createElement("td");
-          nameTd.textContent = r.name || "";
-          const ptsTd = document.createElement("td");
-          ptsTd.textContent = String(r.points || 0);
-          tr.appendChild(rankTd);
-          tr.appendChild(nameTd);
-          tr.appendChild(ptsTd);
-          tbody.appendChild(tr);
-        });
-        table.appendChild(thead);
-        table.appendChild(tbody);
+          const table = document.createElement("table");
+          table.className = "scoreboard-table";
+          const thead = document.createElement("thead");
+          thead.innerHTML = "<tr><th>Rank</th><th>Name</th><th>Points</th></tr>";
+          const tbody = document.createElement("tbody");
+          rows.forEach((r, idx) => {
+            const tr = document.createElement("tr");
+            const rankTd = document.createElement("td");
+            rankTd.textContent = String(idx + 1);
+            const nameTd = document.createElement("td");
+            nameTd.textContent = r.name || "";
+            const ptsTd = document.createElement("td");
+            ptsTd.textContent = String(r.points || 0);
+            tr.appendChild(rankTd);
+            tr.appendChild(nameTd);
+            tr.appendChild(ptsTd);
+            tbody.appendChild(tr);
+          });
+          table.appendChild(thead);
+          table.appendChild(tbody);
 
-        menuPanel.innerHTML = "<h2>Scoreboard</h2>";
-        menuPanel.appendChild(table);
-        showMenuPanel();
-        setActiveButton(btnScoreboard);
+          menuPanel.innerHTML = "<h2>Scoreboard</h2>";
+          menuPanel.appendChild(table);
+          showMenuPanel();
+          setActiveButton(btnScoreboard);
       } catch (err) {
         console.error(err);
         alert("Could not load scoreboard.");
