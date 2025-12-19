@@ -3,8 +3,7 @@ import { Game } from "./src/Game.js";
 window.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("game");
   const game = new Game(canvas);
-  const apiLink =
-    "https://script.google.com/macros/s/AKfycbyrQS8RYeZO904xJL3e5_1Zb17_yRZ1qCXlPAGhquSNKiTzvKg3YGVkijrOMBro6shrjw/exec";
+  const apiLink = "https://script.google.com/macros/s/AKfycbw6Q45Wxl7VrfBESpcHOfIATTI2ecxZrktOR75EPwbQey2OcYZf3_jE8MSMYDGxPoamMA/exec";
 
   // Responsive canvas styling for different screen sizes
   function resizeCanvas(canvas, gap = 20) {
@@ -46,6 +45,17 @@ window.addEventListener("DOMContentLoaded", () => {
   const btnCredits = document.getElementById("btn-credits");
 
   let activeButton = null;
+
+  const SECRET_SALT = "OH! OH! OH! YOU'RE A NAUGHTY BOY!";
+  function hashString(str) {
+    let hash = 2166136261;
+    for (let i = 0; i < str.length; i++) {
+      hash ^= str.charCodeAt(i);
+      hash +=
+        (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+    }
+    return (hash >>> 0).toString(16);
+  }
 
   if (btnStart) {
     btnStart.addEventListener("click", () => {
@@ -129,19 +139,24 @@ window.addEventListener("DOMContentLoaded", () => {
         }
 
         // Show spinner and disable input/button
-        let spinner = document.createElement('span');
-        spinner.className = 'spinner';
-        spinner.style.width = '28px';
-        spinner.style.height = '28px';
-        spinner.style.marginLeft = '10px';
+        let spinner = document.createElement("span");
+        spinner.className = "spinner";
+        spinner.style.width = "28px";
+        spinner.style.height = "28px";
+        spinner.style.marginLeft = "10px";
         btnSubmit.parentNode.insertBefore(spinner, btnSubmit.nextSibling);
         btnSubmit.disabled = true;
         submitInput.disabled = true;
 
+        const timestamp = Date.now();
+        const raw = `${name}|${lastScore}|${timestamp}|${SECRET_SALT}`;
+        const hash = hashString(raw);
+
         const payload = {
           name: String(name),
           score: String(lastScore),
-          timestamp: String(Date.now()),
+          timestamp: String(timestamp),
+          hash: hash,
         };
 
         console.log("payload: ", payload);
@@ -152,11 +167,17 @@ window.addEventListener("DOMContentLoaded", () => {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: new URLSearchParams(payload).toString()
+          body: new URLSearchParams(payload).toString(),
         });
 
-        console.log("Submit response:", res);
+        const data = await res.json();
+        console.log("submit response:", data);
+
         if (!res.ok) throw new Error("Failed to submit score");
+
+        if (data.status !== "ok") {
+          throw new Error(SECRET_SALT);
+        }
 
         hideSubmitInput();
         if (submitMsg) {
@@ -167,13 +188,13 @@ window.addEventListener("DOMContentLoaded", () => {
       } catch (err) {
         console.error("Submit failed", err);
         if (submitMsg) {
-          submitMsg.textContent = "Could not submit score";
+          submitMsg.textContent = err.message || "Could not submit score.";
           submitMsg.classList.remove("hidden");
           submitMsg.classList.add("error");
         }
       } finally {
         // Remove spinner and re-enable input/button
-        let s = btnSubmit.parentNode.querySelector('.spinner');
+        let s = btnSubmit.parentNode.querySelector(".spinner");
         if (s) s.remove();
         btnSubmit.disabled = false;
         submitInput.disabled = false;
@@ -296,7 +317,8 @@ window.addEventListener("DOMContentLoaded", () => {
         setActiveButton(btnScoreboard);
       } catch (err) {
         console.error(err);
-        menuPanel.innerHTML = '<h2>Scoreboard</h2><p style="color:#ffb3b3;">Could not load scoreboard.</p>';
+        menuPanel.innerHTML =
+          '<h2>Scoreboard</h2><p style="color:#ffb3b3;">Could not load scoreboard.</p>';
       }
     });
   }
