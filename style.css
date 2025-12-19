@@ -186,12 +186,25 @@ canvas {
   display: none;
 }
 
-/* Allow buttons to wrap and become full-width on small screens */
+/* Keep buttons always on one line; allow horizontal scroll on overflow */
 .overlay-buttons {
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  /* overflow-x: auto; */
+  /* -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+  -ms-overflow-style: none; 
+  scrollbar-width: none;  */
 }
 
-@media (max-width: 480px) {
+.overlay-buttons::-webkit-scrollbar { display: none; }
+
+/* Prevent button text from wrapping and stop them from growing */
+.overlay-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
   .overlay-buttons {
     gap: 8px;
     padding-bottom: 2%;
