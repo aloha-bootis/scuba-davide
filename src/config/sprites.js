@@ -8,13 +8,18 @@ export const SPRITES = {
     './assets/collectables/cod_fish.png',
     './assets/collectables/salmon_fish.png',
     './assets/collectables/tropical_fish.png',
-    './assets/collectables/egg.png'
+    './assets/collectables/egg.png',
+    './assets/collectables/beef.png',
+    './assets/collectables/melon.png',
   ],
   // bad items that penalize player when collected
   BAD: [
     './assets/collectables/wheat.png',
     './assets/collectables/milk.png',
     './assets/collectables/sugar.png',
+    './assets/collectables/bread.png',
+    './assets/collectables/cake.png',
+    './assets/collectables/pufferfish.png'
   ],
   // Default sizes for sprites (used by entity constructors)
   SIZES: {

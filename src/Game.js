@@ -163,8 +163,16 @@ export class Game {
   }
 
   _getNextSpawnDelay() {
-    // uniform distribution: base ± variance
-    return this.spawnIntervalBase + (Math.random() * 2 - 1) * this.spawnIntervalVariance;
+    // Increase difficulty: for every 100 points, reduce spawn interval by 25%
+    let base = this.spawnIntervalBase;
+    let variance = this.spawnIntervalVariance;
+    const difficultySteps = Math.floor(this.score / 100);
+    if (difficultySteps > 0) {
+      const reduction = Math.pow(0.75, difficultySteps); // reduce by 25% per 100 points
+      base = Math.max(400, base * reduction); // min 400ms
+      variance = Math.max(150, variance * reduction); // min 150ms
+    }
+    return base + (Math.random() * 2 - 1) * variance;
   }
 
   _getNextGoodCollectableSpawnDelay() {
