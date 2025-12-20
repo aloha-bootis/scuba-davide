@@ -284,6 +284,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const res = await fetch(apiLink);
         if (!res.ok) throw new Error("Failed to load scoreboard");
         const data = await res.json();
+        console.log("scoreboard data:", data);
         // merge with any locally submitted scores stored in localStorage
         const localRaw = localStorage.getItem("scuba_scores");
         const local = localRaw ? JSON.parse(localRaw) : [];
@@ -293,7 +294,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const table = document.createElement("table");
         table.className = "scoreboard-table";
         const thead = document.createElement("thead");
-        thead.innerHTML = "<tr><th>Rank</th><th>Name</th><th>Points</th></tr>";
+        thead.innerHTML = "<tr><th>Rank</th><th>Name</th><th>Score</th></tr>";
         const tbody = document.createElement("tbody");
         rows.forEach((r, idx) => {
           const tr = document.createElement("tr");
@@ -302,7 +303,7 @@ window.addEventListener("DOMContentLoaded", () => {
           const nameTd = document.createElement("td");
           nameTd.textContent = r.name || "";
           const ptsTd = document.createElement("td");
-          ptsTd.textContent = String(r.points || 0);
+          ptsTd.textContent = String(r.score || 0);
           tr.appendChild(rankTd);
           tr.appendChild(nameTd);
           tr.appendChild(ptsTd);
