@@ -1,0 +1,25 @@
+{
+  "name": "scuba-davide",
+  "version": "1.0.0",
+  "description": "Progetto giochino per secret santa iniziato 05/12/2025, speriamo di farcela!",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "esbuild main.js --bundle --minify --outfile=dist/game.min.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aloha-bootis/scuba-davide.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/aloha-bootis/scuba-davide/issues"
+  },
+  "homepage": "https://github.com/aloha-bootis/scuba-davide#readme",
+  "devDependencies": {
+    "esbuild": "^0.27.2"
+  }
+}
