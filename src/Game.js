@@ -58,6 +58,19 @@ export class Game {
     this.bgImage.src = './assets/background/background_new2.png';
     // cache menu overlay element (optional)
     this.menuOverlay = document.getElementById('menu-overlay');
+
+    this.music = new Audio("assets/music/scuba-davide.mp3");
+    this.music.loop = true;
+    this.music.volume = 0.6;
+  }
+
+  startAudio() {
+    this.music.play().catch(err => console.error(err));
+  }
+
+  stopAndResetAudio() {
+    this.music.pause();        // stop playback
+    this.music.currentTime = 0; // rewind to start
   }
 
   updatePlayer() {
@@ -269,6 +282,8 @@ export class Game {
     // save final score before reset
     this.finalScore = this.score;
 
+    this.stopAndResetAudio();
+
     // reset game state
     this.isRunning = false;
     this.isDead = false;
@@ -393,6 +408,7 @@ export class Game {
     // hide DOM overlay buttons when starting
     console.log("Hiding menu overlay", this.menuOverlay);
     this.menuOverlay.classList.add('hidden');
+    this.startAudio();
   }
 
   handleCanvasClick(event) {

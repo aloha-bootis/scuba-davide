@@ -1,6 +1,8 @@
-- Scuba Davide status sprites: Cassandra Gasparrino ❤️
+- Scuba Davide status sprites: Cassandra Gasparrino 💪
+ 
+- Play test and future sea urchin sprite: Ceciliaaaa 👾
 
-- Sea urchin sprite: Ceciliaaaa 👾
+- Support and play test: Linda ❤️
 
 - Water background: https://craftpix.net/freebies/free-underwater-world-pixel-art-backgrounds/?num=1&count=29&sq=underwater&pos=2
 
