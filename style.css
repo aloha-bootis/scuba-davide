@@ -1,8 +1,8 @@
-/* Full-screen dark background */
+
 body, html {
   margin: 0;
   padding: 0;
-  background-color: #0a1e3f; /* Dark blue */
+  background-color: #0a1e3f; 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,48 +14,42 @@ body, html {
   -ms-touch-action: none;
 }
 
-/* Container to stack title above canvas */
 .container {
   text-align: center;
   position: relative;
   padding: 10px;
 }
 
-/* Title styling */
 h1 {
   color: white;
   font-weight: bold;
   font-size: 2rem;
   position: absolute;
-  top: -60px; /* adjust above canvas */
+  top: -60px;
   left: 0;
   text-align: left;
 }
 
-/* Canvas styling */
 canvas {
-  background-color: white; /* canvas is white */
+  background-color: white;
   display: block;
   margin: 0 auto;
   border-radius: 8px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  touch-action: none;  /* IMPORTANT */
+  touch-action: none;  
   -ms-touch-action: none;
 }
 
-/* Overlay buttons that live on top of the canvas (centered) */
 .overlay {
   position: absolute;
-  inset: 0; /* cover the container */
+  inset: 0; 
   display: flex;
   flex-direction: column;
-  /* panel fills the space and buttons remain pinned to bottom */
   justify-content: space-between;
   align-items: center;
-  pointer-events: none; /* let children opt-in */
+  pointer-events: none; 
 }
 
-/* allow hiding the entire overlay by toggling the 'hidden' class on #menu-overlay */
 .overlay.hidden {
   display: none !important;
 }
@@ -63,8 +57,6 @@ canvas {
 .menu-panel {
   pointer-events: auto;
   width: calc(100%);
-  /* max-width: 880px; */
-  /* allow the panel to expand and fill space above the buttons */
   flex: 1 1 auto;
   margin: 8px 0 12px 0;
   background: rgba(0, 0, 0, 0.85);
@@ -79,13 +71,11 @@ canvas {
 
 .menu-panel h2 { margin-top: 0; }
 
-/* allow toggling visibility of the menu panel only */
 .menu-panel.hidden {
   display: none !important;
 }
 
 
-/* submit area holds input + button centered within overlay */
 .submit-area {
   position: absolute;
   top: 60%;
@@ -110,14 +100,13 @@ canvas {
 
 .submit-msg {
   margin-top: 6px;
-  color: #b3ffb3; /* success green */
+  color: #b3ffb3;
   font-size: 14px;
   text-align: center;
 }
 .submit-msg.error { color: #ffb3b3; }
 .submit-msg.hidden { display: none !important; }
 
-/* centered submit button shown after a finished run with a non-zero score */
 .submit-btn {
   pointer-events: auto;
   padding: 14px 20px;
@@ -134,17 +123,15 @@ canvas {
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding-bottom: 2%; /* keep the buttons comfortably above bottom */
+  padding-bottom: 2%;
 }
 
-/* Scoreboard table styling inside the menu panel */
 .scoreboard-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 8px;
 }
 
-/* Spinner for loading scoreboard */
 .spinner {
   display: block;
   margin: 40px auto 24px auto;
@@ -169,7 +156,6 @@ canvas {
 
 .overlay-btn {
   pointer-events: auto;
-  /* responsive padding and font size */
   padding: clamp(8px, 1.6vw, 14px) clamp(12px, 2.4vw, 20px);
   font-size: clamp(14px, 2.4vw, 18px);
   border-radius: 8px;
@@ -199,7 +185,6 @@ canvas {
   display: none;
 }
 
-/* Keep buttons always on one line; allow horizontal scroll on overflow */
 .overlay-buttons {
   flex-wrap: nowrap;
   /* overflow-x: auto; */
@@ -211,7 +196,7 @@ canvas {
 
 .overlay-buttons::-webkit-scrollbar { display: none; }
 
-/* Prevent button text from wrapping and stop them from growing */
+
 .overlay-btn {
   flex: 0 0 auto;
   white-space: nowrap;
@@ -241,8 +226,8 @@ canvas {
     /* width: 100%; */
     font-size: 12px;
     padding: 6px 8px;
-    height: auto;           /* let height be based on padding + font */
-    box-sizing: border-box; /* ensure padding included in width/height */
+    height: auto;          
+    box-sizing: border-box; 
   }
 
   .submit-btn {
@@ -250,8 +235,8 @@ canvas {
     /* width: 100%; */
     font-size: 11px;
     padding: 6px 8px;
-    height: auto;           /* let height be based on padding + font */
-    box-sizing: border-box; /* tighter */
+    height: auto;        
+    box-sizing: border-box; 
   }
 }
 
