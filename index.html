@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+   <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+  <title>Scuba Davide</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <div id="scuba-davide-container" class="container">
+    <h1>SCUBA DAVIDE</h1>
+    <canvas id="game" width="800" height="450"></canvas>
+    
+    <div id="menu-overlay" class="overlay" aria-hidden="false">
+
+      <div id="menu-panel" class="menu-panel">
+        <h2>Welcome to Scuba Davide</h2>
+      </div>
+      
+      <div class="overlay-buttons">
+        <button id="btn-start" class="overlay-btn">Dive!</button>
+        <button id="btn-tutorial" class="overlay-btn secondary">Tutorial</button>
+        <button id="btn-scoreboard" class="overlay-btn tertiary">Scoreboard</button>
+        <button id="btn-credits" class="overlay-btn">Credits</button>
+      </div>
+      <!-- Submit area: input + button centered when there's a non-zero final score -->
+      <div id="submit-area" class="submit-area hidden" aria-hidden="true">
+        <input id="submit-name" class="submit-input" type="text" maxlength="32" placeholder="Your name" aria-label="Name" />
+        <button id="btn-submit" class="overlay-btn submit-btn disabled" >Submit</button>
+        <div id="submit-msg" class="submit-msg hidden" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+    
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+
+</html>

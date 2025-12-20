@@ -1,0 +1,18 @@
+{
+    "scores": [{
+        "name": "AAA",
+        "points": 1000
+    }, {
+        "name": "BBB",
+        "points": 800
+    }, {
+        "name": "CCC",
+        "points": 600
+    }, {
+        "name": "DDD",
+        "points": 400
+    }, {
+        "name": "EEE",
+        "points": 200
+    }]
+}
