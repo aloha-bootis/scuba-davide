@@ -406,9 +406,10 @@ export class Game {
     this.isRunning = true;
     this.input.enable();
     // hide DOM overlay buttons when starting
-    console.log("Hiding menu overlay", this.menuOverlay);
     this.menuOverlay.classList.add('hidden');
     this.startAudio();
+
+    console.warn("OH! OH! OH! YOU'RE NAUGHTY ONE NON SBIRCIARE!");
   }
 
   handleCanvasClick(event) {

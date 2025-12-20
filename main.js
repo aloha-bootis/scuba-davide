@@ -284,7 +284,6 @@ window.addEventListener("DOMContentLoaded", () => {
         const res = await fetch(apiLink);
         if (!res.ok) throw new Error("Failed to load scoreboard");
         const data = await res.json();
-        console.log("scoreboard data:", data);
         // merge with any locally submitted scores stored in localStorage
         const localRaw = localStorage.getItem("scuba_scores");
         const local = localRaw ? JSON.parse(localRaw) : [];
@@ -348,7 +347,6 @@ window.addEventListener("DOMContentLoaded", () => {
         const res = await fetch("./assets/text/credits.md");
         if (!res.ok) throw new Error("Failed to load credits");
         const text = await res.text();
-        console.log("Credits text:", text);
         menuPanel.innerHTML =
           "<h2>Credits</h2>" +
           '<pre style="white-space:pre-wrap; color:#fff;">' +

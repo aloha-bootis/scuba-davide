@@ -209,7 +209,6 @@ export class inputHandler {
   }
 
   enable() {
-    console.log("Enabling input handler", this._isEnabled);
     if (this._isEnabled) return; // Already enabled
     this._isEnabled = true;
 
@@ -250,7 +249,6 @@ export class inputHandler {
   }
 
   disable() {
-    console.log("Disabling input handler", this._isEnabled);
     if (!this._isEnabled) return; // Already disabled
     this._isEnabled = false;
 
