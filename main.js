@@ -289,7 +289,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const localRaw = localStorage.getItem("scuba_scores");
         const local = localRaw ? JSON.parse(localRaw) : [];
         const merged = (data.scores || []).concat(local || []);
-        const rows = data.slice().sort((a, b) => b.points - a.points);
+        const rows = data.slice().sort((a, b) => b.score - a.score);
         // build table
         const table = document.createElement("table");
         table.className = "scoreboard-table";
